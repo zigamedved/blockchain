@@ -1,4 +1,4 @@
-// code snippet from @simplyexplained on YT
+// inspired by @simplyexplained on YT
 const SHA256 = require('crypto-js/sha256')
 
 class Block{
