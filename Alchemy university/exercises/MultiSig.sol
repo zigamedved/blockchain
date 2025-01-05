@@ -10,6 +10,7 @@ contract MultiSig {
         uint256 weiValue;
         bool executed;
         uint256 confirmations;
+        bytes data;
     }
 
     Transaction[] public transactions;
@@ -30,9 +31,10 @@ contract MultiSig {
 
     function addTransaction(
         address destination,
-        uint256 value
+        uint256 value,
+        bytes memory data
     ) internal returns (uint) {
-        transactions.push(Transaction(destination, value, false, 0));
+        transactions.push(Transaction(destination, value, false, 0, data));
         return transactions.length - 1;
     }
 
@@ -60,8 +62,12 @@ contract MultiSig {
         return transactions[transactionId].confirmations;
     }
 
-    function submitTransaction(address destination, uint value) external {
-        uint transactionId = addTransaction(destination, value);
+    function submitTransaction(
+        address destination,
+        uint value,
+        bytes memory data
+    ) external {
+        uint transactionId = addTransaction(destination, value, data);
         confirmTransaction(transactionId);
     }
 
@@ -76,7 +82,7 @@ contract MultiSig {
 
         (bool success, ) = transactions[transactionId].destination.call{
             value: transactions[transactionId].weiValue
-        }("");
+        }(transactions[transactionId].data);
         require(success, "Failed to execute transaction");
 
         transactions[transactionId].executed = true;
